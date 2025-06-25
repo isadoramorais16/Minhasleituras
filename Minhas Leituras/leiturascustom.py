@@ -1,3 +1,29 @@
+def validar_login(nome_usuario, senha_usuario):
+    try:
+        with open("usuarios.txt", "r") as arquivo:
+            for linha in arquivo:
+                nome, senha = linha.strip().split(";")
+                if nome == nome_usuario and senha == senha_usuario:
+                    return True
+        return False
+    except FileNotFoundError:
+        print("Arquivo de usuários não encontrado.")
+        return False
+
+# Exemplo de uso:
+nome = input("Digite seu nome de usuário: ")
+senha = input("Digite sua senha: ")
+
+if validar_login(nome, senha):
+    print("Login bem-sucedido! ✅")
+else:
+    print("Usuário ou senha incorretos. ❌")
+
+
+
+
+
+
 import customtkinter as ctk
 from tkinter import messagebox
 
