@@ -1,6 +1,6 @@
 import os 
 import re
-import random
+
 
 arquivo = "minhas_leituras.txt "
 leituras = []
@@ -10,45 +10,81 @@ def carregar_dados():
     with open(arquivo, "r", encoding="utf-8") as f:
         for linha in f:
             dados = linha.strip().split("|")
-            if len(dados) == 5:
+            if len(dados) == 6:
                 minha_leitura = {
                     "nome": dados[0],
                     "idade": dados[1],
                     "Cidade/Estado": dados[2],
                     "preferência de gênero": dados[3],
-                    "faixa etária": dados[4]
+                    "senha": dados[4],
+                    "faixa etária": dados[5]
                 }
                 leituras.append(minha_leitura)
 
 def salvar_dados():
     with open(arquivo, "w", encoding="utf-8") as f:
         for let in leituras:
-            linha = f"{let['nome']}|{let['idade']}|{let['Cidade/Estado']}|{let['preferência de gênero']}|{let['faixa etária']}\n"
+            linha = f"{let['nome']}|{let['idade']}|{let['Cidade/Estado']}|{let['preferência de gênero']}|{let['faixa etária']}|{let['senha']}\n"
             f.write(linha)
+
+
 
 
 def menu():
     while True:
         print("\033[1;34;40m--------- Minhas Leituras ---------\033[m")
         print("\033[1;34;40m|1.\033[m Cadastrar usuário ")
-        print("\033[1;34;40m|2.\033[m Login do usuário ")
-        print("\033[1;34;40m|3.\033[m Visitar Minha Lista de livros ")
-        print("\033[1;34;40m|4.\033[m Ritmo de Leitura e Estudo ")
-        print("\033[1;34;40m|5.\033[m Sair")
+        print("\033[1;34;40m|2.\033[m Visitar Minha Biblioteca ")
+        print("\033[1;34;40m|3.\033[m Ritmo de Leitura e Estudo ")
+        print("\033[1;34;40m|4.\033[m Sair")
         opção = input("\033[1;34;40m Digite uma opção: \033[m")
         if opção == "1":
             cadastrar_usuario()
         elif opção == "2":
-            login_usuario()
+            menu_2()
         elif opção == "3":
-            minha_lista()
-        elif opção == "4":
             ritmo_leitura()
-        elif opção == "5":
+        elif opção == "4":
             print("\033[1;34;40mObrigado por usar o programa Minhas Leituras! Até logo!\033[m")
             break
         else:
             print("\033[0;31mOpção inválida. Por favor, escolha uma opção válida.\033[m")
+
+
+def menu_2():
+    while True:
+        validar_login = input("Você já possui um usuário cadastrado? (sim/não): ").strip().lower()
+        if validar_login not in ["sim", "não", "nao", "ss", "nn", "não"]:
+            print("\033[31mResposta inválida. Por favor, responda com 'sim' ou 'não'.\033[0;0m")
+        else:
+            if validar_login == "sim":
+                nome_usuario = input("Digite seu nome de usuário: ").strip()
+                senha_usuario = input("Digite sua senha: ").strip()
+                if validar_login(nome_usuario, senha_usuario):
+                    print("Login bem-sucedido! ✅")
+                else:
+                    print("Usuário ou senha incorretos. ❌")
+            else:
+                print("\033[1;36;40m--------- Minha Biblioteca ---------\033[m")
+                print("\033[1;36;40m|1.\033[m Adicionar livro ")
+                print("\033[1;36;40m|2.\033[m Lista de  livros ")
+                print("\033[1;36;40m|3.\033[m Remover livro ")
+                print("\033[1;36;40m|4.\033[m Voltar ao menu principal ")
+                print("\033[1;36;40m|5.\033[m Marcar livro como lido")
+                opção = input("\033[1;34;40m Digite uma opção: \033[m")
+                if opção == "1":
+                    adicionar_livro()
+                elif opção == "2":
+                    listar_livros()
+                elif opção == "3":
+                    remover_livro()
+                elif opção == "4":
+                    menu()
+                else:
+                    print("\033[0;31mOpção inválida. Por favor, escolha uma opção válida.\033[m")
+            continue
+
+
 
 
 def cadastrar_usuario():
@@ -61,7 +97,7 @@ def cadastrar_usuario():
         elif any(i.isdigit() for i in nome):
             print("\033[31mNão é válido utilização de números.\033[0;0m") 
         else:
-            print("\033[1;34;40mBem vindo(a) ao programa Minhas Leituras,", nome, "\033[m")
+            print("\033[1;34;40mBem vindo(a) ao programa Minhas Leituras,", nome, "!\033[m")
             break
 
     while True:
@@ -108,54 +144,38 @@ def cadastrar_usuario():
         cidade_estado = input("informe sua Cidade/Estado: ")
         if not cidade_estado:
             print("\033[31mCampo obrigatório!\033[0;0m")
-        elif not re.match(r"^[A-Za-z\s]+,[A-Z]{2}$", cidade_estado):
-            print("\033[31mFormato inválido. Use 'Cidade, Estado' (ex: São Paulo,SP).\033[0;0m")
-        elif re.search(r"^(Pernambuco|Paraíba|Rio Grande do Norte|Ceará|Alagoas|Bahia|Sergipe|Minas Gerais|Espírito Santo|Rio de Janeiro|São Paulo|Paraná|Santa Catarina|Rio Grande do Sul)$", cidade_estado):
-            print("\033[32mCidade/Estado não reconhecido.\033[0;0m")
+        elif not re.match(r"^[a-zA-Z\s]+,\s*[A-Z]{2}$", cidade_estado):
+            print("\033[31mFormato inválido. Use o formato 'Cidade, Estado' (ex: São Paulo, SP).\033[0;0m")
         else:
             print("\033[1;32mCidade/Estado cadastrado com sucesso.\033[0;0m")
             break
-    print("Temos algumas recomendações para autores específicos dessa região!")
-    while True:
-        cid_recom = input("Gostaria de ver as recomendações?").strip().lower()
-        if cid_recom in ["sim", "ss", "Sim"]:
-            rec_aut(cidade_estado)
-        elif cid_recom in ["não","nao","nn","Não"]:
-            print("Tudo bem, vamos prosseguir.")
-        else:
-            print("Resposta não reconhecida. Por favor, digite 'sim' ou 'não'.")
-            break
+    print("\033[1;34;40mAgora, vamos falar sobre seus gêneros literários favoritos.\033[m")
     while True:
         gen = input("Qual gênero literário que você mais se identifica? ").strip().lower()
-        if gen in ["romance", "ficção", "aventura", "fantasia", "terror", "suspense", "biografia", "autoajuda"]:
+        if gen in ("romance", "ficção", "aventura", "fantasia", "terror", "suspense", "biografia", "autoajuda"):
             print(f"Ótima escolha! Seu gênero favorito é {gen}.")
-        else:
-            print("Gênero não reconhecido. Por favor, escolha entre: romance, ficção, aventura, fantasia, terror, suspense, biografia ou autoajuda.")
-            break
+            print("\033[1;34;40mPerfeito! Vamos salvar suas informações.\033[m")
             
+        else:
+            print("\033[31mGênero não reconhecido. Por favor, escolha entre: romance, ficção, aventura, fantasia, terror, suspense, biografia ou autoajuda.\033[0;0m")
+        break
     leituras.append({
-            "nome": nome,
-            "idade": idade,
-            "Cidade/Estado": cidade_estado,
-            "preferência de gênero": gen,
-            "faixa etária": rec_livros(idade),
-            })
+                "nome": nome,
+                "idade": idade,
+                "Cidade/Estado": cidade_estado,
+                "preferência de gênero": gen,
+                "faixa etária": "Criança" if idade <= 11 else "Adolescente" if idade <= 17 else "Jovem" if idade <= 25 else "Adulto",
+                "senha": senha
+            }) 
     salvar_dados()
-    print(f"\033[1;34;40mUsuário '{nome}' cadastrado com sucesso!\033[m")
+    print(f"\033[1;32mUsuário cadastrado com sucesso!\033[m")
+    return menu()
 
-    
 
 def login_usuario():
-        nome = input("Digite seu nome: ")
-        for let in leituras:
-            if let["nome"].lower() == nome.lower():
-                print(f"Bem-vindo(a) de volta, {let['nome']}!")
-                print(f"Idade: {let['idade']}")
-                print(f"Cidade/Estado: {let['Cidade/Estado']}")
-                print(f"Preferência de gênero: {let['preferência de gênero']}")
-                print(f"Faixa etária: {let['faixa etária']}")
-                return
-        print("Usuário não encontrado. Por favor, cadastre-se primeiro.")
+        
+    return menu_2()
+
         
     
         
@@ -163,21 +183,6 @@ def login_usuario():
 
 
 
-autores = {"Nordeste": {"livros": ["Ariano Suassuna", "João Cabral de Melo Neto", "Graciliano Ramos", "Jorge Amado", "Clarice Lispector"]},
-           "Sudeste": {"livros": ["Machado de Assis", "Carlos Drummond de Andrade", "Clarice Lispector", "Adélia Prado", "Rubem Fonseca"]},
-           "Sul": {"livros": ["Erico Verissimo", "Lya Luft", "Manoel de Barros", "Mário Quintana", "Cecília Meireles"]},
-           "Centro-Oeste": {"livros": ["Guimarães Rosa", "Cora Coralina", "Ariano Suassuna"]},
-           "Norte": {"livros": ["Joaquim Nabuco", "Dalcídio Jurandir", "Milton Hatoum"]}}
-
-def rec_aut(cidade_estado):
-    estado = cidade_estado.split(",")[1].strip().upper()
-    for regiao, info in autores.items():
-        if estado in info["livros"]:
-            print(f"\n\033[1;34;40mRecomendações de autores da região {regiao}:\033[m")
-            for autor in info["livros"]:
-                print(f"📚 {autor}")
-            return
-    print("Nenhuma recomendação encontrada para a sua região.")
 
 
 
@@ -207,6 +212,7 @@ def rec_livros(idade):
 print("               ")
 
 menu()
+
 
 
 
