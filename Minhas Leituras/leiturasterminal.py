@@ -172,9 +172,6 @@ def cadastrar_usuario():
     return menu()
 
 
-def login_usuario():
-        
-    return menu_2()
 
         
     
@@ -209,7 +206,6 @@ def rec_livros(idade):
 
 
 
-print("               ")
 
 menu()
 
