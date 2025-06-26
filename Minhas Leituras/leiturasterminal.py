@@ -1,41 +1,3 @@
-def barra_progresso_livro(paginas_lidas, total_paginas, largura=30):
-    if total_paginas <= 0:
-        return "Livro sem páginas?"
-    if paginas_lidas > total_paginas:
-        paginas_lidas = total_paginas
-
-    porcentagem = paginas_lidas / total_paginas
-    preenchido = int(largura * porcentagem)
-    vazio = largura - preenchido
-    barra = f"[{'█' * preenchido}{' ' * vazio}]"
-    porcento = round(porcentagem * 100)
-
-    return f"{barra} {porcento}% ({paginas_lidas}/{total_paginas} páginas)"
-
-
-def prever_tempo_restante(paginas_lidas, total_paginas, media_paginas_por_hora):
-    if media_paginas_por_hora <= 0:
-        return "Média inválida."
-
-    paginas_restantes = total_paginas - paginas_lidas
-    horas_totais = paginas_restantes / media_paginas_por_hora
-    horas = int(horas_totais)
-    minutos = round((horas_totais - horas) * 60)
-
-    return f"⏳ Estimativa de tempo para terminar: {horas}h {minutos}min"
-
-
-# --------- EXEMPLO DE USO ---------
-total_paginas = int(input("Digite o total de páginas do livro: "))
-paginas_lidas = int(input("Quantas páginas você já leu? "))
-media_paginas_por_hora = float(input("Qual sua média de leitura por hora? "))
-
-print()
-print(barra_progresso_livro(paginas_lidas, total_paginas))
-print(prever_tempo_restante(paginas_lidas, total_paginas, media_paginas_por_hora))
-
-
-
 import os 
 import re
 
@@ -48,21 +10,22 @@ def carregar_dados():
     with open(arquivo, "r", encoding="utf-8") as f:
         for linha in f:
             dados = linha.strip().split("|")
-            if len(dados) == 6:
+            if len(dados) == 7:
                 minha_leitura = {
                     "nome": dados[0],
                     "senha": dados[1],
                     "Cidade/Estado": dados[2],
                     "preferência de gênero": dados[3],
                     "idade": dados[4],
-                    "faixa etária": dados[5]
+                    "faixa etária": dados[5],
+                    "preferência de leitura": dados[6]
                 }
                 leituras.append(minha_leitura)
 
 def salvar_dados():
     with open(arquivo, "w", encoding="utf-8") as f:
         for let in leituras:
-            linha = f"{let['nome']}|{let['idade']}|{let['Cidade/Estado']}|{let['preferência de gênero']}|{let['faixa etária']}|{let['senha']}\n"
+            linha = f"{let['nome']}|{let['idade']}|{let['Cidade/Estado']}|{let['preferência de gênero']}|{let['faixa etária']}|{let['senha']}|{let['preferência de leitura']}\n"
             f.write(linha)
 
 
@@ -90,15 +53,17 @@ def menu():
 
 
 def menu_2():
+    carregar_dados()
     login()
-    while login is True:
+    if login() == True:
         print("\033[1;36;40m--------- Minha Biblioteca ---------\033[m")
         print("\033[1;36;40m|1.\033[m Adicionar livro ")
         print("\033[1;36;40m|2.\033[m Lista de  livros ")
         print("\033[1;36;40m|3.\033[m Remover livro ")
         print("\033[1;36;40m|4.\033[m Voltar ao menu principal ")
         print("\033[1;36;40m|5.\033[m Marcar livro como lido")
-        opção = input("\033[1;34;40m Digite uma opção: \033[m")
+        print("\033[1;36;40m|6.\033[m Ver progresso de leitura ")
+        opção = input("\033[1;36;40m Digite uma opção: \033[m")
         if opção == "1":
             adicionar_livro()
         elif opção == "2":
@@ -107,9 +72,13 @@ def menu_2():
             remover_livro()
         elif opção == "4":
             menu()
+        elif opção == "5":
+            marcar_livro_lido()
+        elif opção == "6":
+            progresso_livro()
         else:
             print("\033[0;31mOpção inválida. Por favor, escolha uma opção válida.\033[m")
-            continue
+    
 
 
 
@@ -175,6 +144,13 @@ def cadastrar_usuario():
         else:
             print("\033[1;32mCidade/Estado cadastrado com sucesso.\033[0;0m")
             break
+    while True:
+        pref_book = input("Você prefere livros digitais ou físicos? ").strip().lower()
+        if not pref_book:
+            print("\033[31mCampo obrigatório!\033[0;0m")
+        elif pref_book in ["digital", "físico", "fisicos","físicos","digitais"]:
+            print(f"\033[1;34;40mVocê prefere livros {pref_book}. Legal!\033[m")
+            break
     print("\033[1;34;40mAgora, vamos falar sobre seus gêneros literários favoritos.\033[m")
     while True:
         gen = input("Qual gênero literário que você mais se identifica? ").strip().lower()
@@ -200,33 +176,99 @@ def cadastrar_usuario():
 
 
 def login():
-    print("\033[36mLogin\033[0;0m")
-    usuario_nome = input("Digite seu nome de usuário: ").strip()
-    usuario_senha = input("Digite sua senha: ").strip()
-    # Verifica se o email e a senha existem no arquivo
-    with open("minhas_leituras.txt", "r") as arquivo:
-        for linha in arquivo:
-            nome, senha = linha.strip()  # Pega apenas o nome e a senha
-            if usuario_nome == nome and usuario_senha == senha:
-                print("\033[32mLogin realizado com sucesso!\033[0;0m")
-                menu_2()
-            else:
-                print("\033[31mUsuário ou email não encontrados!\033[0;0m")
+    carregar_dados()
+    nome = input("Digite seu nome: ").strip()
+    senha = input("Digite sua senha: ").strip()
+    for let in leituras:
+        if let["nome"].lower() == nome.lower() and let["senha"] == senha:
+            print(f"\033[1;32mBem-vindo(a), {let['nome']}!\033[m")
+            return menu_2()
+        else:
+            print("\033[31mUsuário ou senha incorretos. Tente novamente.\033[0;0m")
+            return False
 
 
 def ritmo_leitura():
+    print("\033[1;34;40m--------- Ritmo de Leitura e Estudo ---------\033[m")
     digital_livros = int(input("Quantos livros DIGITAIS você tem lido no último ano? "))
+    resposta = input("Você gostaria de saber quantos livros digitais você lerá nos próximos 5 anos? ").strip().lower()
+    if resposta in ["sim", "ss", "Sim"]:
+        digital_result = digital_livros * 5
+        print("\033[1;34;40mSe continuar nesse ritmo você lerá", digital_result, "livros digitais nos próximos 5 anos\033[m")
+        if digital_result >= 50:
+            print("\033[1;32mVocê é um leitor digital ávido!\033[0;0m")
+        elif digital_result >= 20:
+            print("\033[1;33mVocê é um leitor digital moderado!\033[0;0m")
+        elif digital_result >= 10:
+            print("\033[1;34mVocê é um leitor digital ocasional!\033[0;0m")
+        else:
+            print("\033[1;31mVocê é um leitor digital iniciante! Que tal explorar mais o hábito de leitura? \033[0;0m")
+    elif resposta in ["não", "nao", "nn", "Não"]:
+        print("\033[1;34;40mTudo bem, vamos continuar.\033[m")
     fisico_livros = int(input("Quantos livros FÍSICOS você tem lido no último ano? "))
-    result_digital = digital_livros * 5
-    print("\033[1;34;40mVocê lerá", result_digital, "livros digitais nos próximos 5 anos\033[m")
-    if result_digital >= 50:
-        print("\033[1;32mVocê é um leitor digital ávido!\033[0;0m")
-    elif result_digital >= 20:
-        print("\033[1;33mVocê é um leitor digital moderado!\033[0;0m")
-    elif result_digital >= 10:
-        print("\033[1;34mVocê é um leitor digital ocasional!\033[0;0m")
-    else:
-        print("\033[1;31mVocê é um leitor digital iniciante! Que tal explorar mais o hábito de leitura? \033[0;0m")
+    resposta_2 = input("Você gostaria de saber quantos livros físicos você lerá nos próximos 5 anos? ").strip().lower()
+    if resposta_2 in ["sim", "ss", "Sim"]:
+        fisico_result = fisico_livros * 5
+        print("\033[1;34;40mSe continuar nesse ritmo você lerá", fisico_result, "livros físicos nos próximos 5 anos\033[m")
+        if fisico_result >= 50:
+            print("\033[1;32mVocê é um leitor ávido!\033[0;0m")
+        elif fisico_result >= 20:
+            print("\033[1;33mVocê é um leitor moderado!\033[0;0m")
+        elif fisico_result >= 10:
+            print("\033[1;34mVocê é um leitor ocasional!\033[0;0m")
+        else:
+            print("\033[1;31mVocê é um leitor iniciante! Que tal explorar mais o hábito de leitura? \033[0;0m")
+    elif resposta_2 in ["não", "nao", "nn", "Não"]:
+        print("\033[1;34;40mTudo bem, vamos continuar.\033[m")
+    horas_estudo = int(input("Quantas horas você se dedica aos livros de estudos por semana? "))
+    horas_result = horas_estudo * 52
+    print("\033[1;34;40mSe continuar nesse ritmo você estudará", horas_result, "horas em um ano!\033[m")
+    if horas_result <= 550:
+        print("\033[1;31mVocê é um estudante iniciante! Que tal dedicar mais tempo aos estudos?\033[0;0m")
+    elif horas_result >= 550:
+        print("\033[1;32mVocê é um estudante dedicado! Continue assim!\033[0;0m")
+
+
+def progresso_livro(paginas_lidas, total_paginas, largura=30):
+    total_paginas = int(input("Digite o total de páginas do livro: "))
+    paginas_lidas = int(input("Quantas páginas você já leu? "))
+    paginas_hora = float(input("Quantas páginas você tem lido por hora? "))
+    if total_paginas <= 0:
+        return "Livro sem páginas?"
+    elif paginas_lidas > total_paginas:
+        paginas_lidas = total_paginas
+    elif paginas_lidas < 0:
+        return "Número de páginas lidas não pode ser negativo."
+    elif not paginas_lidas:
+        return "Você ainda não leu nenhuma página."
+    elif not total_paginas:
+        return "O total de páginas não pode ser zero."
+    elif paginas_hora <= 0:
+        return "Média de páginas por hora inválida."
+    elif paginas_hora > total_paginas:
+        return "Média de páginas por hora não pode ser maior que o total de páginas."
+
+    porcentagem = paginas_lidas / total_paginas
+    preenchido = int(largura * porcentagem)
+    vazio = largura - preenchido
+    barra = f"[{'█' * preenchido}{' ' * vazio}]"
+    porcento = round(porcentagem * 100)
+
+    return f"{barra} {porcento}% ({paginas_lidas}/{total_paginas} páginas)"
+
+
+def prever_tempo_restante(paginas_lidas, total_paginas, media_paginas_por_hora):
+    if paginas_hora <= 0:
+        return "Média inválida."
+
+    paginas_restantes = total_paginas - paginas_lidas
+    horas_totais = paginas_restantes / paginas_hora
+    horas = int(horas_totais)
+    minutos = round((horas_totais - horas) * 60)
+
+    return f"⏳ Estimativa de tempo para terminar: {horas}h {minutos}min"
+
+
 
 
 
