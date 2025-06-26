@@ -1,3 +1,41 @@
+def barra_progresso_livro(paginas_lidas, total_paginas, largura=30):
+    if total_paginas <= 0:
+        return "Livro sem páginas?"
+    if paginas_lidas > total_paginas:
+        paginas_lidas = total_paginas
+
+    porcentagem = paginas_lidas / total_paginas
+    preenchido = int(largura * porcentagem)
+    vazio = largura - preenchido
+    barra = f"[{'█' * preenchido}{' ' * vazio}]"
+    porcento = round(porcentagem * 100)
+
+    return f"{barra} {porcento}% ({paginas_lidas}/{total_paginas} páginas)"
+
+
+def prever_tempo_restante(paginas_lidas, total_paginas, media_paginas_por_hora):
+    if media_paginas_por_hora <= 0:
+        return "Média inválida."
+
+    paginas_restantes = total_paginas - paginas_lidas
+    horas_totais = paginas_restantes / media_paginas_por_hora
+    horas = int(horas_totais)
+    minutos = round((horas_totais - horas) * 60)
+
+    return f"⏳ Estimativa de tempo para terminar: {horas}h {minutos}min"
+
+
+# --------- EXEMPLO DE USO ---------
+total_paginas = int(input("Digite o total de páginas do livro: "))
+paginas_lidas = int(input("Quantas páginas você já leu? "))
+media_paginas_por_hora = float(input("Qual sua média de leitura por hora? "))
+
+print()
+print(barra_progresso_livro(paginas_lidas, total_paginas))
+print(prever_tempo_restante(paginas_lidas, total_paginas, media_paginas_por_hora))
+
+
+
 import os 
 import re
 
