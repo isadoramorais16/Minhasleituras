@@ -13,10 +13,10 @@ def carregar_dados():
             if len(dados) == 6:
                 minha_leitura = {
                     "nome": dados[0],
-                    "idade": dados[1],
+                    "senha": dados[1],
                     "Cidade/Estado": dados[2],
                     "preferência de gênero": dados[3],
-                    "senha": dados[4],
+                    "idade": dados[4],
                     "faixa etária": dados[5]
                 }
                 leituras.append(minha_leitura)
@@ -52,38 +52,26 @@ def menu():
 
 
 def menu_2():
-    while True:
-        validar_login = input("Você já possui um usuário cadastrado? (sim/não): ").strip().lower()
-        if validar_login not in ["sim", "não", "nao", "ss", "nn", "não"]:
-            print("\033[31mResposta inválida. Por favor, responda com 'sim' ou 'não'.\033[0;0m")
+    login()
+    while login is True:
+        print("\033[1;36;40m--------- Minha Biblioteca ---------\033[m")
+        print("\033[1;36;40m|1.\033[m Adicionar livro ")
+        print("\033[1;36;40m|2.\033[m Lista de  livros ")
+        print("\033[1;36;40m|3.\033[m Remover livro ")
+        print("\033[1;36;40m|4.\033[m Voltar ao menu principal ")
+        print("\033[1;36;40m|5.\033[m Marcar livro como lido")
+        opção = input("\033[1;34;40m Digite uma opção: \033[m")
+        if opção == "1":
+            adicionar_livro()
+        elif opção == "2":
+            listar_livros()
+        elif opção == "3":
+            remover_livro()
+        elif opção == "4":
+            menu()
         else:
-            if validar_login == "sim":
-                nome_usuario = input("Digite seu nome de usuário: ").strip()
-                senha_usuario = input("Digite sua senha: ").strip()
-                if validar_login(nome_usuario, senha_usuario):
-                    print("Login bem-sucedido! ✅")
-                else:
-                    print("Usuário ou senha incorretos. ❌")
-            else:
-                print("\033[1;36;40m--------- Minha Biblioteca ---------\033[m")
-                print("\033[1;36;40m|1.\033[m Adicionar livro ")
-                print("\033[1;36;40m|2.\033[m Lista de  livros ")
-                print("\033[1;36;40m|3.\033[m Remover livro ")
-                print("\033[1;36;40m|4.\033[m Voltar ao menu principal ")
-                print("\033[1;36;40m|5.\033[m Marcar livro como lido")
-                opção = input("\033[1;34;40m Digite uma opção: \033[m")
-                if opção == "1":
-                    adicionar_livro()
-                elif opção == "2":
-                    listar_livros()
-                elif opção == "3":
-                    remover_livro()
-                elif opção == "4":
-                    menu()
-                else:
-                    print("\033[0;31mOpção inválida. Por favor, escolha uma opção válida.\033[m")
+            print("\033[0;31mOpção inválida. Por favor, escolha uma opção válida.\033[m")
             continue
-
 
 
 
@@ -173,20 +161,35 @@ def cadastrar_usuario():
 
 
 
-        
-    
-        
+def login():
+    print("\033[36mLogin\033[0;0m")
+    usuario_nome = input("Digite seu nome de usuário: ").strip()
+    usuario_senha = input("Digite sua senha: ").strip()
+    # Verifica se o email e a senha existem no arquivo
+    with open("minhas_leituras.txt", "r") as arquivo:
+        for linha in arquivo:
+            nome, senha = linha.strip()  # Pega apenas o nome e a senha
+            if usuario_nome == nome and usuario_senha == senha:
+                print("\033[32mLogin realizado com sucesso!\033[0;0m")
+                menu_2()
+            else:
+                print("\033[31mUsuário ou email não encontrados!\033[0;0m")
 
 
+def ritmo_leitura():
+    digital_livros = int(input("Quantos livros DIGITAIS você tem lido no último ano? "))
+    fisico_livros = int(input("Quantos livros FÍSICOS você tem lido no último ano? "))
+    result_digital = digital_livros * 5
+    print("\033[1;34;40mVocê lerá", result_digital, "livros digitais nos próximos 5 anos\033[m")
+    if result_digital >= 50:
+        print("\033[1;32mVocê é um leitor digital ávido!\033[0;0m")
+    elif result_digital >= 20:
+        print("\033[1;33mVocê é um leitor digital moderado!\033[0;0m")
+    elif result_digital >= 10:
+        print("\033[1;34mVocê é um leitor digital ocasional!\033[0;0m")
+    else:
+        print("\033[1;31mVocê é um leitor digital iniciante! Que tal explorar mais o hábito de leitura? \033[0;0m")
 
-
-
-
-
-faixas ={"Criança":{"min":0, "max":11,"livros":["O Pequeno Príncipe, Chapeuzinho Vermelho,Diário de um Banana"]},
-    "Adolescente":{"min":12,"max":17,"livros":["Harry Potter,Crepúsculo,Jogos Vorazes",]},
-    "Jovem":{"min":18,"max":25,"livros":["1984,O sol é para todos,Quarto de Despejo"]},
-    "Adulto":{"min":26,"max":1000,"livros":["Café com Deus Pai, A Abolição do Homem"]}}
 
 
 def rec_livros(idade):
@@ -204,11 +207,14 @@ def rec_livros(idade):
         return
     print("Idade fora do intervalo permitido.")
 
+faixas ={"Criança":{"min":0, "max":11,"livros":["O Pequeno Príncipe, Chapeuzinho Vermelho,Diário de um Banana"]},
+    "Adolescente":{"min":12,"max":17,"livros":["Harry Potter,Crepúsculo,Jogos Vorazes",]},
+    "Jovem":{"min":18,"max":25,"livros":["1984,O sol é para todos,Quarto de Despejo"]},
+    "Adulto":{"min":26,"max":1000,"livros":["Café com Deus Pai, A Abolição do Homem"]}}
 
 
 
 menu()
-
 
 
 
